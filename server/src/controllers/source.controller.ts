@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import { getZodFieldErrors } from "../utils/zod-error.js";
 import { workspaceIdParamSchema } from "../validators/workspace.validator.js";
 import { ValidationError } from "../types/app-error.js";
-import { createSourceSchema, listSourcesQuerySchema, sourceIdParamSchema } from "../validators/source.validator.js";
-import { createTextOrMarkdownSource, deleteSourceForWorkspace, getSourceForWorkspace, listSourcesForWorkspace } from "../services/source.services.js";
+import { createSourceSchema, importWebsiteSchema, importYoutubeSchema, listSourcesQuerySchema, sourceIdParamSchema } from "../validators/source.validator.js";
+import { createTextOrMarkdownSource, deleteSourceForWorkspace, getSourceForWorkspace, importWebsiteUrl, importYoutubeUrl, listSourcesForWorkspace, uploadPdfSource } from "../services/source.services.js";
 import { getWorkspaceByIdForUser } from "../services/workspace.services.js";
 
 function parseWorkspaceId(params: Request["params"]) {
@@ -84,4 +84,29 @@ export async function bulkDeleteSources(req: Request, res: Response) {
     for (const id of sourceId) {
         await deleteSourceForWorkspace(workspaceId, id, req.session.user.id);
     }
+}
+export async function uploadPdf(req: Request, res: Response) {
+    const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+    if(!req.file) {
+        throw new ValidationError("File is required");
+    }
+
+    const title = req.body.title as string;
+
+    const source = await uploadPdfSource(workspaceId, req.session.user.id, req.file,title);
+    res.status(201).json(source);
+}
+
+export async function importWebsite(req: Request, res: Response) {
+    const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+    const input = importWebsiteSchema.parse(req.body);
+    const source = await importWebsiteUrl(workspaceId, req.session.user.id, input);
+    res.status(201).json(source);
+}
+
+export async function importYoutube(req: Request, res: Response) {
+    const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+    const input = importYoutubeSchema.parse(req.body);
+    const source = await importYoutubeUrl(workspaceId, req.session.user.id, input);
+    res.status(201).json(source);
 }

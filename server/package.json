@@ -22,12 +22,16 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@mendable/firecrawl-js": "^4.32.2",
+    "@pinecone-database/pinecone": "^8.2.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "ai": "^7.0.66",
     "better-auth": "^1.6.26",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "inngest": "^4.18.1",
     "multer": "^2.2.0",
     "pg": "^8.22.0",
     "zod": "^4.4.3"

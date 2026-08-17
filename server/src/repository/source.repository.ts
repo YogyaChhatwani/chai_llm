@@ -27,6 +27,7 @@ export type CreateSourceData = {
     url?: string | null;
     status?: SourceRecord["status"];
     metadata?: Prisma.InputJsonValue;
+    content?: string | null;
 };
 
 
