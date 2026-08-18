@@ -27,6 +27,10 @@ export function listWorkspaces() {
   return apiFetch<Workspace[]>("/api/v1/workspaces");
 }
 
+export function getWorkspace(id: string) {
+  return apiFetch<Workspace>(`/api/v1/workspaces/${id}`);
+}
+
 export function createWorkspace(input: CreateWorkspaceInput) {
   return apiFetch<Workspace>("/api/v1/workspaces", {
     method: "POST",

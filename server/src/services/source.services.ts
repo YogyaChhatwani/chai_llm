@@ -40,13 +40,13 @@ export async function createTextOrMarkdownSource(
 ) {
     await getWorkspaceByIdForUser(workspaceId, userId);
 
-    // return createAndProcessSource({
-    //     workspaceId,
-    //     type: input.type,
-    //     title: input.title,
-    //     content: input.content,
-    //     status: "PENDING",
-    // });
+    return createAndProcessSource({
+        workspaceId,
+        type: input.type,
+        title: input.title,
+        description: input.description,
+        status: "PENDING",
+    });
 }
 
 export async function getSourceForWorkspace(
