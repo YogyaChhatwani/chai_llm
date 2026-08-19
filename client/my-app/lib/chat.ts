@@ -8,13 +8,54 @@ export type Conversation = {
   updatedAt: string;
 };
 
+export type ChatCitation = {
+  sourceId?: string;
+  sourceTitle?: string;
+  sourceType?: string;
+  url?: string;
+  excerpt?: string;
+};
+
 export type ChatMessage = {
   id: string;
   conversationId: string;
   role: "USER" | "ASSISTANT";
   content: string;
+  citations?: unknown;
   createdAt: string;
 };
+
+export function parseCitations(value: unknown): ChatCitation[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") {
+      return [];
+    }
+
+    const citation = item as Record<string, unknown>;
+
+    return [
+      {
+        sourceId:
+          typeof citation.sourceId === "string" ? citation.sourceId : undefined,
+        sourceTitle:
+          typeof citation.sourceTitle === "string"
+            ? citation.sourceTitle
+            : undefined,
+        sourceType:
+          typeof citation.sourceType === "string"
+            ? citation.sourceType
+            : undefined,
+        url: typeof citation.url === "string" ? citation.url : undefined,
+        excerpt:
+          typeof citation.excerpt === "string" ? citation.excerpt : undefined,
+      },
+    ];
+  });
+}
 
 export function listConversations(workspaceId: string) {
   return apiFetch<Conversation[]>(

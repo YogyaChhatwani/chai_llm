@@ -44,9 +44,10 @@ import {
 } from "@/hooks/use-workspaces";
 import type { Workspace } from "@/lib/workspaces";
 
-export function WorkspaceList() {
+export function WorkspaceList({ userName }: { userName?: string | null }) {
   const { data: workspaces, isPending, error } = useWorkspaces();
   const remove = useDeleteWorkspace();
+  const greeting = userName?.split(" ")[0];
 
   const [formOpen, setFormOpen] = useState(false);
   const [workspaceToEdit, setWorkspaceToEdit] = useState<Workspace | null>(
@@ -84,9 +85,11 @@ export function WorkspaceList() {
     <div className="flex flex-1 flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl font-medium">Workspaces</h1>
+          <h1 className="font-heading text-2xl font-medium">
+            Welcome back{greeting ? `, ${greeting}` : ""}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Create a space for your sources and chats.
+            Create a notebook for your sources, chats, and learning tools.
           </p>
         </div>
         <Button type="button" onClick={openCreate}>

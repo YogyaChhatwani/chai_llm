@@ -1,11 +1,11 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { WorkspaceChat } from "@/components/chat/workspace-chat";
 import { Spinner } from "@/components/ui/spinner";
+import { WorkspaceSettings } from "@/components/workspaces/workspace-settings";
 import { useWorkspace } from "@/hooks/use-workspaces";
 
-export default function WorkspaceChatPage() {
+export default function WorkspaceSettingsPage() {
   const params = useParams<{ workspaceId: string }>();
   const workspaceId =
     typeof params.workspaceId === "string" ? params.workspaceId : "";
@@ -13,18 +13,15 @@ export default function WorkspaceChatPage() {
 
   if (!workspaceId || !workspace) {
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex flex-1 items-center justify-center p-6">
         <Spinner className="size-6" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col p-4">
-      <WorkspaceChat
-        workspaceId={workspaceId}
-        defaultModel={workspace.defaultModel}
-      />
+    <div className="p-6">
+      <WorkspaceSettings workspace={workspace} />
     </div>
   );
 }

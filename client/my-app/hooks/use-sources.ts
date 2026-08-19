@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createTextSource,
   deleteSource,
+  getSource,
   importWebsite,
   importYoutube,
   listSources,
@@ -17,6 +18,8 @@ export const sourceKeys = {
   all: (workspaceId: string) => ["sources", workspaceId] as const,
   list: (workspaceId: string, filters: ListSourcesQuery = {}) =>
     [...sourceKeys.all(workspaceId), "list", filters] as const,
+  detail: (workspaceId: string, sourceId: string) =>
+    [...sourceKeys.all(workspaceId), "detail", sourceId] as const,
 };
 
 export function useSources(
@@ -35,6 +38,18 @@ export function useSources(
       );
 
       return isBusy ? 3000 : false;
+    },
+  });
+}
+
+export function useSource(workspaceId: string, sourceId: string | null) {
+  return useQuery({
+    queryKey: sourceKeys.detail(workspaceId, sourceId ?? "none"),
+    queryFn: () => getSource(workspaceId, sourceId!),
+    enabled: Boolean(workspaceId && sourceId),
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === "PENDING" || status === "PROCESSING" ? 3000 : false;
     },
   });
 }

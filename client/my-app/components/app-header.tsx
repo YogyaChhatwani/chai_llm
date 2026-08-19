@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,17 @@ export function AppHeader({ user }: AppHeaderProps) {
 
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
-      <p className="font-heading text-sm font-medium">Chai</p>
+      <div className="flex items-center gap-4">
+        <Link href="/" className="font-heading text-sm font-medium">
+          Chai
+        </Link>
+        <Link
+          href="/memory"
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          Memory
+        </Link>
+      </div>
       <div className="flex items-center gap-2">
         <Avatar size="sm">
           {user.image ? <AvatarImage src={user.image} alt={user.name} /> : null}

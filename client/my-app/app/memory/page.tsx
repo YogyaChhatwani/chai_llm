@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { MemoryList } from "@/components/memory/memory-list";
 import { Spinner } from "@/components/ui/spinner";
-import { WorkspaceList } from "@/components/workspaces/workspace-list";
 import { useSession } from "@/hooks/use-auth";
 
-export default function HomePage() {
+export default function MemoryPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
 
@@ -29,7 +29,7 @@ export default function HomePage() {
     <div className="flex flex-1 flex-col">
       <AppHeader user={session.user} />
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col p-6">
-        <WorkspaceList userName={session.user.name} />
+        <MemoryList />
       </main>
     </div>
   );

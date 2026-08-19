@@ -18,6 +18,21 @@ export const SOURCE_STATUSES = [
 export type SourceType = (typeof SOURCE_TYPES)[number];
 export type SourceStatus = (typeof SOURCE_STATUSES)[number];
 
+export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
+  TEXT: "Text",
+  MARKDOWN: "Markdown",
+  WEBSITE: "Website",
+  YOUTUBE: "YouTube",
+  PDF: "PDF",
+};
+
+export const SOURCE_STATUS_LABELS: Record<SourceStatus, string> = {
+  PENDING: "Pending",
+  PROCESSING: "Processing",
+  COMPLETED: "Ready",
+  FAILED: "Failed",
+};
+
 export type Source = {
   id: string;
   workspaceId: string;
@@ -112,6 +127,39 @@ export function uploadPdf(workspaceId: string, file: File, title?: string) {
       body,
     },
   );
+}
+
+export function getSource(workspaceId: string, sourceId: string) {
+  return apiFetch<Source>(
+    `/api/v1/workspaces/${workspaceId}/sources/${sourceId}`,
+  );
+}
+
+export type SourceMetadata = {
+  fileUrl?: string;
+  fileName?: string;
+  processingError?: string;
+  chunkCount?: number;
+};
+
+export function parseSourceMetadata(value: unknown): SourceMetadata {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+
+  const metadata = value as Record<string, unknown>;
+
+  return {
+    fileUrl: typeof metadata.fileUrl === "string" ? metadata.fileUrl : undefined,
+    fileName:
+      typeof metadata.fileName === "string" ? metadata.fileName : undefined,
+    processingError:
+      typeof metadata.processingError === "string"
+        ? metadata.processingError
+        : undefined,
+    chunkCount:
+      typeof metadata.chunkCount === "number" ? metadata.chunkCount : undefined,
+  };
 }
 
 export function deleteSource(workspaceId: string, sourceId: string) {

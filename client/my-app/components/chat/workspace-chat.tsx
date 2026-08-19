@@ -7,6 +7,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { Bot } from "lucide-react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import {
   Empty,
@@ -28,7 +29,8 @@ import {
   useDeleteConversation,
 } from "@/hooks/use-conversations";
 import { API_URL } from "@/lib/api";
-import type { ChatMessage } from "@/lib/chat";
+import { parseCitations, type ChatMessage } from "@/lib/chat";
+import { CHAT_MODELS, isChatModel, type ChatModel } from "@/lib/workspaces";
 
 function toUIMessages(messages: ChatMessage[]): UIMessage[] {
   return messages.map((message) => ({
@@ -45,11 +47,25 @@ function getMessageText(message: UIMessage) {
     .join("");
 }
 
-export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
+export function WorkspaceChat({
+  workspaceId,
+  defaultModel,
+}: {
+  workspaceId: string;
+  defaultModel: string;
+}) {
   const queryClient = useQueryClient();
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [model, setModel] = useState<ChatModel>(
+    isChatModel(defaultModel) ? defaultModel : "gpt-4o-mini",
+  );
+  const [webSearch, setWebSearch] = useState(false);
   const conversationIdRef = useRef<string | null>(null);
+  const modelRef = useRef(model);
+  const webSearchRef = useRef(webSearch);
   conversationIdRef.current = conversationId;
+  modelRef.current = model;
+  webSearchRef.current = webSearch;
 
   const { data: conversations, isPending: conversationsPending } =
     useConversations(workspaceId);
@@ -64,10 +80,13 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
       new DefaultChatTransport({
         api: `${API_URL}/api/v1/workspaces/${workspaceId}/chat`,
         credentials: "include",
-        body: () =>
-          conversationIdRef.current
+        body: () => ({
+          ...(conversationIdRef.current
             ? { conversationId: conversationIdRef.current }
-            : {},
+            : {}),
+          model: modelRef.current,
+          webSearch: webSearchRef.current,
+        }),
         fetch: async (input, init) => {
           const response = await fetch(input, {
             ...init,
@@ -161,6 +180,21 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
             </NativeSelectOption>
           ))}
         </NativeSelect>
+        <NativeSelect
+          className="min-w-40"
+          value={model}
+          onChange={(event) => {
+            if (isChatModel(event.target.value)) {
+              setModel(event.target.value);
+            }
+          }}
+        >
+          {CHAT_MODELS.map((chatModel) => (
+            <NativeSelectOption key={chatModel} value={chatModel}>
+              {chatModel}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
         <Button type="button" variant="outline" onClick={startNewChat}>
           New
         </Button>
@@ -191,6 +225,10 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
           <div className="flex flex-col gap-4">
             {messages.map((message) => {
               const isUser = message.role === "user";
+              const stored = storedMessages?.find(
+                (item) => item.id === message.id,
+              );
+              const citations = parseCitations(stored?.citations);
 
               return (
                 <Message key={message.id} align={isUser ? "end" : "start"}>
@@ -200,6 +238,37 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
                         {getMessageText(message)}
                       </BubbleContent>
                     </Bubble>
+                    {citations.length ? (
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {citations.map((citation, index) => {
+                          const label =
+                            citation.sourceTitle ??
+                            citation.url ??
+                            citation.sourceType ??
+                            "Source";
+                          const badge = (
+                            <Badge variant="outline">{label}</Badge>
+                          );
+
+                          if (citation.url) {
+                            return (
+                              <a
+                                key={`${citation.url}-${index}`}
+                                href={citation.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {badge}
+                              </a>
+                            );
+                          }
+
+                          return (
+                            <span key={`${label}-${index}`}>{badge}</span>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </MessageContent>
                 </Message>
               );
@@ -214,6 +283,8 @@ export function WorkspaceChat({ workspaceId }: { workspaceId: string }) {
 
       <ChatComposer
         disabled={isStreaming}
+        webSearch={webSearch}
+        onWebSearchChange={setWebSearch}
         onSend={(text) => {
           void sendMessage({ text });
         }}
