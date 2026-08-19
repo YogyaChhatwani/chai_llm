@@ -141,6 +141,7 @@ model SourceChunk {
   source     Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
   content    String
   index      Int
+  metadata   Json?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

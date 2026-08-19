@@ -4,7 +4,7 @@ import { requireAuth } from "../middleware/require-auth.middleware.js";
 import { bulkDeleteSources, createSource, deleteSource, getSource, importWebsite, importYoutube, listSources, uploadPdf } from "../controllers/source.controller.js";
 import { uploadSinglePdf } from "../middleware/upload.middleware.js";
 
-export const sourceRoutes = Router();
+export const sourceRoutes = Router({ mergeParams: true });
 sourceRoutes.use(requireAuth);
 
  sourceRoutes.get("/", asyncHandler(listSources));

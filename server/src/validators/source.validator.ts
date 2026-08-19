@@ -45,10 +45,13 @@ export const SOURCE_STATUS = z.enum([
     url: z.string().trim().min(1, "URL is required"),
  });
 
+const emptyToUndefined = (value: unknown) =>
+    value === "" || value === undefined || value === null ? undefined : value;
+
  export const listSourcesQuerySchema = z.object({
-    query: z.string().trim().optional(),
-    type: SOURCE_TYPES.optional(),
-    status: SOURCE_STATUS.optional(),
+    query: z.preprocess(emptyToUndefined, z.string().trim().optional()),
+    type: z.preprocess(emptyToUndefined, SOURCE_TYPES.optional()),
+    status: z.preprocess(emptyToUndefined, SOURCE_STATUS.optional()),
  })
 
  export const bulkDeleteSourcesSchema = z.object({

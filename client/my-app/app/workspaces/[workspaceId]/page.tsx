@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
+import { WorkspaceChat } from "@/components/chat/workspace-chat";
 import { SourceList } from "@/components/sources/source-list";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspaces";
 
@@ -76,7 +78,7 @@ export default function WorkspacePage() {
   return (
     <div className="flex flex-1 flex-col">
       <AppHeader user={session.user} />
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6">
+      <main className="mx-auto flex w-full max-w-5xl min-h-0 flex-1 flex-col gap-4 p-6">
         <div>
           <Link
             href="/"
@@ -94,7 +96,21 @@ export default function WorkspacePage() {
             </p>
           ) : null}
         </div>
-        <SourceList workspaceId={workspaceId} />
+        <Tabs defaultValue="chat" className="flex min-h-0 flex-1 flex-col">
+          <TabsList>
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+            <TabsTrigger value="sources">Sources</TabsTrigger>
+          </TabsList>
+          <TabsContent
+            value="chat"
+            className="flex min-h-0 flex-1 flex-col pt-4"
+          >
+            <WorkspaceChat workspaceId={workspaceId} />
+          </TabsContent>
+          <TabsContent value="sources" className="pt-4">
+            <SourceList workspaceId={workspaceId} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
