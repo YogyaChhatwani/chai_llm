@@ -4,6 +4,7 @@ import { chatRoutes, conversationRoutes } from "./chat.route.js";
 import type { Express } from "express";
 import memoryRoutes from "./memory.route.js";
 import { artifactRoutes } from "./artifact.route.js";
+import { waitlistRouter } from "./waitlist.route.js";
 
 export function registerRoutes(app: Express) {
     workspaceRoutes.use("/:workspaceId/sources", sourceRoutes);
@@ -12,4 +13,5 @@ export function registerRoutes(app: Express) {
     workspaceRoutes.use("/:workspaceId/artifacts", artifactRoutes);
     app.use("/api/v1/workspaces", workspaceRoutes);
     app.use("/api/v1/memory", memoryRoutes);
+    app.use("/api/v1/waitlist", waitlistRouter);
 }

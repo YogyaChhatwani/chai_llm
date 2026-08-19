@@ -6,10 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   BookOpen,
+  BotMessageSquare,
   GraduationCap,
-  MessageSquare,
   Plus,
-  Settings,
+  Settings2,
+  Sparkles,
 } from "lucide-react";
 import { SourceFormDialog } from "@/components/sources/source-form-dialog";
 import { SourceSidebarList } from "@/components/sources/source-sidebar-list";
@@ -90,7 +91,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
                       tooltip="Chat"
                       render={<Link href={basePath} />}
                     >
-                      <MessageSquare />
+                      <BotMessageSquare />
                       <span>Chat</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -123,7 +124,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
                       tooltip="Settings"
                       render={<Link href={settingsPath} />}
                     >
-                      <Settings />
+                      <Settings2 />
                       <span>Settings</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

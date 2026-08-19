@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FolderOpen, MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus, Sparkles } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -116,7 +116,7 @@ export function WorkspaceList({ userName }: { userName?: string | null }) {
         <Empty className="border">
           <EmptyHeader>
             <EmptyMedia variant="icon">
-              <FolderOpen />
+              <Sparkles />
             </EmptyMedia>
             <EmptyTitle>No DevCharts yet</EmptyTitle>
             <EmptyDescription>

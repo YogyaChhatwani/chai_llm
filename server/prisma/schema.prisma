@@ -185,6 +185,14 @@ model Message {
   @@map("message")
 }
 
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("waitlist_entry")
+}
+
 enum artifactType {
   SUMMARY
   TAKEAWAY

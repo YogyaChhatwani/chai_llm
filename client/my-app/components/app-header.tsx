@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Brain, LogOut, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -23,15 +24,17 @@ export function AppHeader({ user }: AppHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
       <div className="flex items-center gap-4">
-        <Link href="/" className="flex items-center gap-1.5 font-heading text-lg font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 font-heading text-lg font-semibold tracking-tight">
+          <Sparkles className="size-5 text-primary" />
           <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
             DevKundli
           </span>
         </Link>
         <Link
           href="/memory"
-          className="text-sm text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
+          <Brain className="size-3.5" />
           Memory
         </Link>
       </div>
@@ -51,7 +54,7 @@ export function AppHeader({ user }: AppHeaderProps) {
             })
           }
         >
-          {signOut.isPending ? <Spinner /> : "Sign out"}
+          {signOut.isPending ? <Spinner /> : <><LogOut className="size-3.5" /> Sign out</>}
         </Button>
         <ModeToggle />
       </div>

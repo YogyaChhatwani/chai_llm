@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { FileText, Code2, Globe, Video } from "lucide-react";
 import {
   useCreateTextSource,
   useImportWebsite,
@@ -194,11 +195,11 @@ export function SourceFormDialog({
 
         <Tabs defaultValue="text" className="gap-4">
           <TabsList className="w-full">
-            <TabsTrigger value="text">Text</TabsTrigger>
-            <TabsTrigger value="markdown">Markdown</TabsTrigger>
-            <TabsTrigger value="pdf">PDF</TabsTrigger>
-            <TabsTrigger value="website">Website</TabsTrigger>
-            <TabsTrigger value="youtube">YouTube</TabsTrigger>
+            <TabsTrigger value="text"><FileText className="size-3.5" /> Text</TabsTrigger>
+            <TabsTrigger value="markdown"><Code2 className="size-3.5" /> Markdown</TabsTrigger>
+            {/* <TabsTrigger value="pdf">PDF</TabsTrigger> */}
+            <TabsTrigger value="website"><Globe className="size-3.5" /> Website</TabsTrigger>
+            <TabsTrigger value="youtube"><Video className="size-3.5" /> YouTube</TabsTrigger>
           </TabsList>
 
           <TabsContent value="text" className="grid gap-4 pt-2">
@@ -248,34 +249,11 @@ export function SourceFormDialog({
             </SubmitButton>
           </TabsContent>
 
+          {/* PDF tab hidden for now
           <TabsContent value="pdf" className="grid gap-4 pt-2">
-            <Field
-              id="pdf-title"
-              label="Title (optional)"
-              value={pdfTitle}
-              onChange={setPdfTitle}
-              placeholder="Optional title"
-              disabled={isPending}
-            />
-            <div className="grid gap-2">
-              <Label htmlFor="pdf-file">PDF file</Label>
-              <Input
-                id="pdf-file"
-                type="file"
-                accept="application/pdf"
-                disabled={isPending}
-                onChange={(event) => setPdfFile(event.target.files?.[0] ?? null)}
-              />
-              {pdfFile ? (
-                <p className="text-xs text-muted-foreground">
-                  Selected: {pdfFile.name}
-                </p>
-              ) : null}
-            </div>
-            <SubmitButton pending={isPending} onClick={() => void submitPdf()}>
-              Upload PDF
-            </SubmitButton>
+            ...
           </TabsContent>
+          */}
 
           <TabsContent value="website" className="grid gap-4 pt-2">
             <Field
