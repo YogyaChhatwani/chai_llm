@@ -97,12 +97,12 @@ export function buildChatSystemPrompt(input: {
     webSearchEnabled?: boolean;
 }) {
     const sections: string[] = [
-        "You are Chaibook, an assistant that helps users learn from their workspace sources.",
+        "You are DevKundli, an assistant that helps users learn from their DevCharts sources.",
     ];
 
     if (input.webSearchEnabled) {
         sections.push(
-            "You have access to a web_search tool for up-to-date information outside the workspace.",
+            "You have access to a web_search tool for up-to-date information outside the DevChart.",
             "Use it when the user asks about recent events or topics not covered by their sources.",
             "Cite web results inline using [W1], [W2], etc. matching the web result blocks.",
         );
@@ -126,7 +126,7 @@ export function buildChatSystemPrompt(input: {
 
     if (input.chunks.length === 0) {
         sections.push(
-            "This workspace has no indexed source content yet, or nothing relevant was retrieved.",
+            "This DevChart has no indexed source content yet, or nothing relevant was retrieved.",
             input.webSearchEnabled
                 ? "Use web search when needed, or answer from general knowledge."
                 : "Answer helpfully from general knowledge and suggest adding or processing sources when appropriate.",

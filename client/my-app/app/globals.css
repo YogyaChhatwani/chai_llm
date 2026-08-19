@@ -128,3 +128,91 @@
     @apply font-sans;
   }
 }
+
+/* DevKundli constellation canvas — tiled dot layers */
+.constellation-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.constellation-bg::before,
+.constellation-bg::after {
+  content: "";
+  position: absolute;
+  inset: -40px;
+}
+
+.constellation-bg::before {
+  background-image:
+    radial-gradient(circle, rgba(255 255 255 / 0.25) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.15) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.35) 1.5px, transparent 1.5px);
+  background-size: 120px 140px, 80px 100px, 200px 180px;
+  background-position: 0 0, 40px 60px, 100px 30px;
+  animation: drift 120s linear infinite;
+}
+
+.constellation-bg::after {
+  background-image:
+    radial-gradient(circle, rgba(255 255 255 / 0.12) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.2) 1px, transparent 1px);
+  background-size: 160px 200px, 240px 160px;
+  background-position: 20px 80px, 60px 10px;
+  animation: drift 180s linear infinite reverse;
+}
+
+:root .constellation-bg::before {
+  background-image:
+    radial-gradient(circle, rgba(0 0 0 / 0.08) 1px, transparent 1px),
+    radial-gradient(circle, rgba(0 0 0 / 0.05) 1px, transparent 1px),
+    radial-gradient(circle, rgba(0 0 0 / 0.1) 1.5px, transparent 1.5px);
+  background-size: 120px 140px, 80px 100px, 200px 180px;
+  background-position: 0 0, 40px 60px, 100px 30px;
+}
+
+:root .constellation-bg::after {
+  background-image:
+    radial-gradient(circle, rgba(0 0 0 / 0.04) 1px, transparent 1px),
+    radial-gradient(circle, rgba(0 0 0 / 0.07) 1px, transparent 1px);
+  background-size: 160px 200px, 240px 160px;
+  background-position: 20px 80px, 60px 10px;
+}
+
+.dark .constellation-bg::before {
+  background-image:
+    radial-gradient(circle, rgba(255 255 255 / 0.25) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.15) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.35) 1.5px, transparent 1.5px);
+}
+
+.dark .constellation-bg::after {
+  background-image:
+    radial-gradient(circle, rgba(255 255 255 / 0.12) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255 255 255 / 0.2) 1px, transparent 1px);
+}
+
+@keyframes drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-40px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}

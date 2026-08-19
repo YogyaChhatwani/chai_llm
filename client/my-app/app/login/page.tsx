@@ -2,14 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Globe, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Spinner } from "@/components/ui/spinner";
 import { useGoogleSignIn, useSession } from "@/hooks/use-auth";
@@ -57,34 +51,74 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex flex-1 items-center justify-center p-6">
-      <div className="absolute top-4 right-4">
+    <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-background px-6 py-16 dark:bg-[oklch(0.1_0.005_280)]">
+      {/* constellation dots */}
+      <div className="constellation-bg" />
+
+      {/* subtle radial glow behind hero */}
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -z-0 size-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl animate-pulse-glow" />
+
+      {/* theme toggle */}
+      <div className="absolute top-4 right-4 z-10">
         <ModeToggle />
       </div>
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-xl">Welcome to Chai</CardTitle>
-          <CardDescription>
-            Sign in with Google to continue.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            className="w-full"
-            disabled={signIn.isPending}
-            onClick={() => signIn.mutate()}
-          >
-            {signIn.isPending ? <Spinner /> : <GoogleIcon />}
-            Continue with Google
-          </Button>
-          {signIn.error ? (
-            <p className="text-sm text-destructive">{signIn.error.message}</p>
-          ) : null}
-        </CardContent>
-      </Card>
+
+      {/* hero */}
+      <div className="relative z-10 flex max-w-xl flex-col items-center gap-6 text-center">
+        {/* brand mark */}
+        <span className="font-mono text-xs font-medium tracking-[0.3em] uppercase text-muted-foreground">
+          DevKundli
+        </span>
+
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          What&rsquo;s written in{" "}
+          <span className="bg-gradient-to-r from-primary via-chart-1 to-chart-3 bg-clip-text text-transparent">
+            your code
+          </span>
+          ?
+        </h1>
+
+        <p className="max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Your repository has a story.
+          <br />
+          We analyze it, understand it,
+          <br />
+          and tell you what comes next.
+        </p>
+
+        {/* CTA */}
+        <Button
+          size="lg"
+          className="mt-2 gap-2 px-8 text-base"
+          disabled={signIn.isPending}
+          onClick={() => signIn.mutate()}
+        >
+          {signIn.isPending ? <Spinner /> : <GoogleIcon />}
+          Generate My DevKundli
+        </Button>
+
+        {signIn.error ? (
+          <p className="text-sm text-destructive">{signIn.error.message}</p>
+        ) : null}
+
+        {/* source icons */}
+        <div className="mt-4 flex items-center gap-6 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="size-3.5" aria-hidden="true">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            GitHub
+          </span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5">
+            <BookOpen className="size-3.5" /> Repository
+          </span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5">
+            <Globe className="size-3.5" /> Website
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

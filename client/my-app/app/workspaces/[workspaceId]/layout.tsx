@@ -67,7 +67,7 @@ export default function WorkspaceLayout({
         <AppHeader user={session.user} />
         <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-6">
           <p className="text-sm text-destructive">
-            {error?.message ?? "Workspace not found"}
+            {error?.message ?? "DevChart not found"}
           </p>
           <Link href="/" className="text-sm underline">
             Back to workspaces

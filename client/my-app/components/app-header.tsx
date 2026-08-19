@@ -23,8 +23,10 @@ export function AppHeader({ user }: AppHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b px-4 py-3">
       <div className="flex items-center gap-4">
-        <Link href="/" className="font-heading text-sm font-medium">
-          Chai
+        <Link href="/" className="flex items-center gap-1.5 font-heading text-lg font-semibold tracking-tight">
+          <span className="bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+            DevKundli
+          </span>
         </Link>
         <Link
           href="/memory"

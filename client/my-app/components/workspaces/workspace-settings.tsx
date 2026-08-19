@@ -77,7 +77,7 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
         <div>
           <h2 className="font-heading text-xl font-medium">Settings</h2>
           <p className="text-sm text-muted-foreground">
-            Update this workspace name, icon, and default model.
+            Update this DevChart's name, icon, and default model.
           </p>
         </div>
 
@@ -146,9 +146,9 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
 
       <div className="grid gap-3 rounded-2xl border border-destructive/30 p-4">
         <div>
-          <h3 className="font-medium">Delete workspace</h3>
+          <h3 className="font-medium">Delete DevChart</h3>
           <p className="text-sm text-muted-foreground">
-            This permanently removes the workspace and its sources.
+            This permanently removes the DevChart and its sources.
           </p>
         </div>
         <Button
@@ -160,14 +160,14 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
             setDeleteOpen(true);
           }}
         >
-          Delete workspace
+          Delete DevChart
         </Button>
       </div>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete workspace?</AlertDialogTitle>
+            <AlertDialogTitle>Delete DevChart?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete &quot;{workspace.title}&quot;.
             </AlertDialogDescription>

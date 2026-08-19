@@ -64,7 +64,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
           <SidebarHeader>
             <div className="flex items-center gap-2 px-2 py-1">
               <span className="text-lg" aria-hidden="true">
-                {workspace.icon ?? "📚"}
+                {workspace.icon || "📚"}
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">
@@ -80,7 +80,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+              <SidebarGroupLabel>DevChart</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
@@ -139,11 +139,11 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  tooltip="All workspaces"
+                  tooltip="All DevCharts"
                   render={<Link href="/" />}
                 >
                   <ArrowLeft />
-                  <span>All workspaces</span>
+                  <span>All DevCharts</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>

@@ -72,7 +72,7 @@ export function WorkspaceFormDialog({
     const input = {
       title: title.trim(),
       description: description.trim() || undefined,
-      icon: icon.trim() || undefined,
+      icon: icon.trim() || "📚",
       defaultModel,
     };
 
@@ -93,12 +93,12 @@ export function WorkspaceFormDialog({
         <form onSubmit={handleSubmit} className="grid gap-6">
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Edit workspace" : "New workspace"}
+              {isEditing ? "Edit DevChart" : "New DevChart"}
             </DialogTitle>
             <DialogDescription>
               {isEditing
                 ? "Update the name, description, or default model."
-                : "Give this workspace a name to get started."}
+                : "Give this DevChart a name to get started."}
             </DialogDescription>
           </DialogHeader>
 

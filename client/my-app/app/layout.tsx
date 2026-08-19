@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chai",
-  description: "Chat with your sources",
+  title: "DevKundli",
+  description: "Discover your Developer DNA",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

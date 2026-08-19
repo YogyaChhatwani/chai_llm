@@ -89,12 +89,12 @@ export function WorkspaceList({ userName }: { userName?: string | null }) {
             Welcome back{greeting ? `, ${greeting}` : ""}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Create a notebook for your sources, chats, and learning tools.
+            Your DevCharts — all your code kundlis in one place.
           </p>
         </div>
         <Button type="button" onClick={openCreate}>
           <Plus />
-          New workspace
+          New DevChart
         </Button>
       </div>
 
@@ -118,15 +118,15 @@ export function WorkspaceList({ userName }: { userName?: string | null }) {
             <EmptyMedia variant="icon">
               <FolderOpen />
             </EmptyMedia>
-            <EmptyTitle>No workspaces yet</EmptyTitle>
+            <EmptyTitle>No DevCharts yet</EmptyTitle>
             <EmptyDescription>
-              Create your first workspace to start adding sources.
+              Create your first DevChart to start discovering your developer DNA.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button type="button" onClick={openCreate}>
               <Plus />
-              New workspace
+              New DevChart
             </Button>
           </EmptyContent>
         </Empty>
@@ -149,10 +149,10 @@ export function WorkspaceList({ userName }: { userName?: string | null }) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete workspace?</AlertDialogTitle>
+            <AlertDialogTitle>Delete DevChart?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete{" "}
-              {workspaceToDelete ? `"${workspaceToDelete.title}"` : "this workspace"}
+              {workspaceToDelete ? `"${workspaceToDelete.title}"` : "this DevChart"}
               .
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -199,14 +199,14 @@ function WorkspaceCard({
 
   return (
     <Card
-      className="cursor-pointer"
+      className="cursor-pointer transition-shadow hover:shadow-md hover:shadow-primary/5"
       onClick={() => router.push(`/workspaces/${workspace.id}`)}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2">
             <span className="text-lg" aria-hidden="true">
-              {workspace.icon ?? "📁"}
+              {workspace.icon ?? "📚"}
             </span>
             <CardTitle className="truncate">{workspace.title}</CardTitle>
           </div>
@@ -218,7 +218,7 @@ function WorkspaceCard({
               <DropdownMenuTrigger>
                 <Button variant="ghost" size="icon-sm">
                   <MoreHorizontal />
-                  <span className="sr-only">Workspace actions</span>
+                  <span className="sr-only">DevChart actions</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
