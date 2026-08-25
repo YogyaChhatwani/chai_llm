@@ -34,23 +34,21 @@ const quizSchema = z.object({
         .max(15),
 });
 
+const mindmapNodeSchema: z.ZodType = z.object({
+    id: z.string(),
+    label: z.string(),
+    category: z.enum(["root", "domain", "module", "component"]).optional(),
+    files: z.array(z.string()).optional(),
+    apis: z.array(z.string()).optional(),
+    dependencies: z.array(z.string()).optional(),
+    issues: z.array(z.string()).optional(),
+    complexity: z.enum(["low", "medium", "high"]).optional(),
+    testCoverage: z.enum(["none", "partial", "good"]).optional(),
+    children: z.lazy(() => z.array(mindmapNodeSchema)).optional(),
+});
+
 const mindmapSchema = z.object({
-    nodes: z
-        .array(
-            z.object({
-                id: z.string(),
-                label: z.string(),
-            }),
-        )
-        .min(2)
-        .max(40),
-    edges: z.array(
-        z.object({
-            id: z.string(),
-            source: z.string(),
-            target: z.string(),
-        }),
-    ),
+    root: mindmapNodeSchema,
 });
 
 const takeawaysSchema = z.object({
@@ -156,9 +154,22 @@ export async function generateArtifactContent(
         case "MINDMAP": {
             const result = await generateText({
                 model: openai(CHAT_MODEL),
-                system,
+                system: [
+                    system,
+                    "You are generating a project architecture mind map.",
+                    "Structure it as a tree: root → domains (Frontend, Backend, Data, etc.) → modules → components.",
+                    "For each node, include relevant metadata when available:",
+                    "- files: key files involved (e.g. src/auth/login.ts)",
+                    "- apis: API endpoints or interfaces (e.g. POST /api/auth/login)",
+                    "- dependencies: libraries or internal deps (e.g. bcrypt, jwt)",
+                    "- issues: potential problems or tech debt",
+                    "- complexity: low | medium | high",
+                    "- testCoverage: none | partial | good",
+                    "Leaf nodes should be specific (Authentication, Routing, Database) not generic.",
+                    "Return a single root object with nested children arrays.",
+                ].join("\n"),
                 output: Output.object({ schema: mindmapSchema }),
-                prompt: `Create a mind map as nodes and edges. Use a central topic node and branch out logically from:\n\n${sourceText}`,
+                prompt: `Analyze this codebase/documentation and generate a hierarchical project architecture map:\n\n${sourceText}`,
             });
             return result.output;
         }

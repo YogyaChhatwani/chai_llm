@@ -1,8 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  Code2,
+  FileCode,
+  Layers,
+  Network,
+  Shield,
+  TestTube,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { Artifact } from "@/lib/artifacts";
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -207,62 +220,318 @@ function QuizViewer({ content }: { content: Record<string, unknown> }) {
   );
 }
 
-function MindmapViewer({ content }: { content: Record<string, unknown> }) {
-  const nodes = Array.isArray(content.nodes)
-    ? content.nodes.flatMap((node) => {
-        const record = asRecord(node);
-        if (!record) {
-          return [];
-        }
+type MindmapNode = {
+  id: string;
+  label: string;
+  category?: "root" | "domain" | "module" | "component";
+  files?: string[];
+  apis?: string[];
+  dependencies?: string[];
+  issues?: string[];
+  complexity?: "low" | "medium" | "high";
+  testCoverage?: "none" | "partial" | "good";
+  children?: MindmapNode[];
+};
 
-        return [
-          {
-            id: typeof record.id === "string" ? record.id : "",
-            label: typeof record.label === "string" ? record.label : "",
-          },
-        ];
-      })
-    : [];
-  const edges = Array.isArray(content.edges)
-    ? content.edges.flatMap((edge) => {
-        const record = asRecord(edge);
-        if (!record) {
-          return [];
-        }
+function parseMindmapNode(raw: unknown): MindmapNode | null {
+  const r = asRecord(raw);
+  if (!r) return null;
 
-        return [
-          {
-            source: typeof record.source === "string" ? record.source : "",
-            target: typeof record.target === "string" ? record.target : "",
-          },
-        ];
-      })
-    : [];
-  const labels = new Map(nodes.map((node) => [node.id, node.label]));
+  return {
+    id: typeof r.id === "string" ? r.id : "",
+    label: typeof r.label === "string" ? r.label : "",
+    category:
+      typeof r.category === "string" &&
+      ["root", "domain", "module", "component"].includes(r.category)
+        ? (r.category as MindmapNode["category"])
+        : undefined,
+    files: asStringArray(r.files),
+    apis: asStringArray(r.apis),
+    dependencies: asStringArray(r.dependencies),
+    issues: asStringArray(r.issues),
+    complexity:
+      typeof r.complexity === "string" &&
+      ["low", "medium", "high"].includes(r.complexity)
+        ? (r.complexity as MindmapNode["complexity"])
+        : undefined,
+    testCoverage:
+      typeof r.testCoverage === "string" &&
+      ["none", "partial", "good"].includes(r.testCoverage)
+        ? (r.testCoverage as MindmapNode["testCoverage"])
+        : undefined,
+    children: Array.isArray(r.children)
+      ? r.children.flatMap((c) => {
+          const parsed = parseMindmapNode(c);
+          return parsed ? [parsed] : [];
+        })
+      : [],
+  };
+}
+
+const complexityColors = {
+  low: "text-green-500",
+  medium: "text-amber-500",
+  high: "text-red-500",
+} as const;
+
+const coverageColors = {
+  none: "text-red-500",
+  partial: "text-amber-500",
+  good: "text-green-500",
+} as const;
+
+function MindmapTreeNode({
+  node,
+  depth,
+}: {
+  node: MindmapNode;
+  depth: number;
+}) {
+  const [expanded, setExpanded] = useState(depth < 2);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const hasChildren = (node.children?.length ?? 0) > 0;
+  const hasMetadata =
+    (node.files?.length ?? 0) > 0 ||
+    (node.apis?.length ?? 0) > 0 ||
+    (node.dependencies?.length ?? 0) > 0 ||
+    (node.issues?.length ?? 0) > 0 ||
+    node.complexity ||
+    node.testCoverage;
 
   return (
-    <div className="grid gap-4 text-sm">
-      <div>
-        <p className="mb-2 font-medium">Topics</p>
-        <ul className="list-disc space-y-1 pl-5">
-          {nodes.map((node) => (
-            <li key={node.id || node.label}>{node.label}</li>
-          ))}
-        </ul>
+    <div className={cn(depth > 0 && "ml-4 border-l border-border/50 pl-3")}>
+      <div className="group flex items-center gap-1.5 py-1">
+        {hasChildren ? (
+          <button
+            type="button"
+            className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-accent"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? (
+              <ChevronDown className="size-3.5" />
+            ) : (
+              <ChevronRight className="size-3.5" />
+            )}
+          </button>
+        ) : (
+          <span className="w-[18px]" />
+        )}
+
+        <button
+          type="button"
+          className={cn(
+            "flex items-center gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors",
+            hasMetadata
+              ? "hover:bg-accent cursor-pointer"
+              : "cursor-default",
+            detailOpen && "bg-accent",
+          )}
+          onClick={() => hasMetadata && setDetailOpen((v) => !v)}
+        >
+          <NodeIcon category={node.category} />
+          <span className="font-medium">{node.label}</span>
+          {node.complexity ? (
+            <span
+              className={cn(
+                "text-[10px] font-mono uppercase",
+                complexityColors[node.complexity],
+              )}
+            >
+              {node.complexity}
+            </span>
+          ) : null}
+          {node.testCoverage ? (
+            <TestCoverageBadge coverage={node.testCoverage} />
+          ) : null}
+          {(node.issues?.length ?? 0) > 0 ? (
+            <AlertTriangle className="size-3 text-amber-500" />
+          ) : null}
+        </button>
       </div>
-      {edges.length ? (
-        <div>
-          <p className="mb-2 font-medium">Connections</p>
-          <ul className="list-disc space-y-1 pl-5">
-            {edges.map((edge) => (
-              <li key={`${edge.source}-${edge.target}`}>
-                {labels.get(edge.source) ?? edge.source} →{" "}
-                {labels.get(edge.target) ?? edge.target}
-              </li>
-            ))}
-          </ul>
+
+      {/* detail panel */}
+      {detailOpen && hasMetadata ? (
+        <div className="mb-2 ml-[18px] grid gap-2 rounded-lg border bg-card p-3 text-xs">
+          {(node.files?.length ?? 0) > 0 ? (
+            <MetadataSection
+              icon={<FileCode className="size-3 text-chart-1" />}
+              label="Files"
+              items={node.files!}
+              mono
+            />
+          ) : null}
+          {(node.apis?.length ?? 0) > 0 ? (
+            <MetadataSection
+              icon={<Network className="size-3 text-chart-2" />}
+              label="APIs"
+              items={node.apis!}
+              mono
+            />
+          ) : null}
+          {(node.dependencies?.length ?? 0) > 0 ? (
+            <MetadataSection
+              icon={<Layers className="size-3 text-chart-3" />}
+              label="Dependencies"
+              items={node.dependencies!}
+            />
+          ) : null}
+          {(node.issues?.length ?? 0) > 0 ? (
+            <MetadataSection
+              icon={<AlertTriangle className="size-3 text-amber-500" />}
+              label="Potential Issues"
+              items={node.issues!}
+            />
+          ) : null}
+          {node.complexity ? (
+            <div className="flex items-center gap-2">
+              <Shield className="size-3 text-muted-foreground" />
+              <span className="text-muted-foreground">Complexity:</span>
+              <span
+                className={cn(
+                  "font-medium uppercase",
+                  complexityColors[node.complexity],
+                )}
+              >
+                {node.complexity}
+              </span>
+            </div>
+          ) : null}
+          {node.testCoverage ? (
+            <div className="flex items-center gap-2">
+              <TestTube className="size-3 text-muted-foreground" />
+              <span className="text-muted-foreground">Test Coverage:</span>
+              <span
+                className={cn(
+                  "font-medium uppercase",
+                  coverageColors[node.testCoverage],
+                )}
+              >
+                {node.testCoverage}
+              </span>
+            </div>
+          ) : null}
         </div>
       ) : null}
+
+      {/* children */}
+      {expanded && hasChildren
+        ? node.children!.map((child) => (
+            <MindmapTreeNode
+              key={child.id || child.label}
+              node={child}
+              depth={depth + 1}
+            />
+          ))
+        : null}
+    </div>
+  );
+}
+
+function NodeIcon({
+  category,
+}: {
+  category?: MindmapNode["category"];
+}) {
+  switch (category) {
+    case "root":
+      return <Code2 className="size-3.5 text-primary" />;
+    case "domain":
+      return <Layers className="size-3.5 text-chart-1" />;
+    case "module":
+      return <Network className="size-3.5 text-chart-2" />;
+    case "component":
+      return <FileCode className="size-3.5 text-chart-3" />;
+    default:
+      return <span className="size-1.5 rounded-full bg-muted-foreground" />;
+  }
+}
+
+function TestCoverageBadge({
+  coverage,
+}: {
+  coverage: "none" | "partial" | "good";
+}) {
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "px-1 py-0 text-[9px] font-mono uppercase leading-tight",
+        coverageColors[coverage],
+      )}
+    >
+      {coverage === "none" ? "no tests" : coverage === "partial" ? "partial" : "tested"}
+    </Badge>
+  );
+}
+
+function MetadataSection({
+  icon,
+  label,
+  items,
+  mono,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  items: string[];
+  mono?: boolean;
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-center gap-1.5 text-muted-foreground">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <ul className="grid gap-0.5 pl-4">
+        {items.map((item) => (
+          <li
+            key={item}
+            className={cn(
+              "text-foreground",
+              mono && "font-mono text-[11px]",
+            )}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function MindmapViewer({ content }: { content: Record<string, unknown> }) {
+  const root = parseMindmapNode(content.root);
+
+  if (!root) {
+    // fallback for old flat format
+    const nodes = Array.isArray(content.nodes)
+      ? content.nodes.flatMap((node) => {
+          const record = asRecord(node);
+          if (!record) return [];
+          return [
+            {
+              id: typeof record.id === "string" ? record.id : "",
+              label: typeof record.label === "string" ? record.label : "",
+            },
+          ];
+        })
+      : [];
+
+    if (!nodes.length) {
+      return <p className="text-sm text-muted-foreground">No mindmap data.</p>;
+    }
+
+    return (
+      <ul className="list-disc space-y-1 pl-5 text-sm">
+        {nodes.map((n) => (
+          <li key={n.id || n.label}>{n.label}</li>
+        ))}
+      </ul>
+    );
+  }
+
+  return (
+    <div className="text-sm">
+      <MindmapTreeNode node={root} depth={0} />
     </div>
   );
 }
