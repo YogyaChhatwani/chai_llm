@@ -23,7 +23,10 @@ export async function fetchYoutubeTranscript(url: string) {
 
     try {
         const segments = await YoutubeTranscript.fetchTranscript(videoId);
-        const content = segments.map((segment) => segment.text).join(" ").trim();
+        const content = segments
+            .map((segment: { text: string }) => segment.text)
+            .join(" ")
+            .trim();
 
         if (!content) {
             throw new ValidationError(
