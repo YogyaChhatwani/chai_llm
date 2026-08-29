@@ -17,7 +17,7 @@ export class NotFoundError extends AppError {
 }
 
 export class ValidationError extends AppError {
-    constructor(message = "Validation failed", details?: unknown) {
+    constructor(message = "Validation failed!", details?: unknown) {
         super(400, message, details);
         this.name = "ValidationError";
     }
