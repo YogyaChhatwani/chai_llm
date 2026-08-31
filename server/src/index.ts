@@ -8,14 +8,22 @@ import { registerRoutes } from "./routes/index.js";
 import { inngest } from "./inngest/client.js";
 import { serve } from "inngest/express";
 import { functions } from "./inngest/index.js";
+import { getClientOrigins, isOriginAllowed } from "./lib/client-origins.js";
 
 const PORT = process.env.PORT;
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+const clientOrigins = getClientOrigins();
 const app = express();
 
 app.use(
   cors({
-    origin: clientUrl,
+    origin(origin, callback) {
+      // Non-browser clients (curl, server-to-server) send no Origin.
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      callback(null, isOriginAllowed(origin, clientOrigins) ? origin : false);
+    },
     credentials: true,
     exposedHeaders: ["X-Conversation-Id"],
   }),

@@ -1,13 +1,16 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "./db.js";
+import { getClientOrigins } from "./client-origins.js";
 
-const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+const clientOrigins = getClientOrigins();
+const authBaseURL = process.env.BETTER_AUTH_URL;
+const isHttpsAuth = authBaseURL?.startsWith("https://") ?? false;
 
 export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: process.env.BETTER_AUTH_URL,
-    trustedOrigins: [clientUrl],
+    baseURL: authBaseURL,
+    trustedOrigins: clientOrigins,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
@@ -17,4 +20,16 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
     },
+    // Frontend (Vercel) and API (Railway) are different sites — cookies must
+    // be SameSite=None or the browser won't send the session on API calls.
+    ...(isHttpsAuth
+        ? {
+              advanced: {
+                  defaultCookieAttributes: {
+                      sameSite: "none" as const,
+                      secure: true,
+                  },
+              },
+          }
+        : {}),
 });
