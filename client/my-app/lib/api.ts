@@ -1,5 +1,9 @@
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8081";
+/**
+ * Same-origin base URL. Requests go to this Next.js app; `next.config.ts`
+ * rewrites `/api/auth/*` and `/api/v1/*` to the Express backend.
+ * That keeps OAuth/session cookies first-party and avoids state_mismatch.
+ */
+export const API_URL = "";
 
 export class ApiError extends Error {
   status: number;

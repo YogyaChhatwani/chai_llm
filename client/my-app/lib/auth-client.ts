@@ -1,10 +1,9 @@
 "use client";
 
 import { createAuthClient } from "better-auth/react";
-import { API_URL } from "@/lib/api";
 
+/** Same-origin auth — proxied to the API via Next.js rewrites. */
 export const authClient = createAuthClient({
-  baseURL: API_URL,
   fetchOptions: {
     credentials: "include",
   },

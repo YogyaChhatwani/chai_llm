@@ -4,12 +4,15 @@ import prisma from "./db.js";
 import { getClientOrigins } from "./client-origins.js";
 
 const clientOrigins = getClientOrigins();
-const authBaseURL = process.env.BETTER_AUTH_URL;
-const isHttpsAuth = authBaseURL?.startsWith("https://") ?? false;
 
+/**
+ * Public URL of the *frontend* (where the browser hits `/api/auth`).
+ * Next.js rewrites proxy those requests to this Express server.
+ * Google redirect URI becomes: {BETTER_AUTH_URL}/api/auth/callback/google
+ */
 export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
-    baseURL: authBaseURL,
+    baseURL: process.env.BETTER_AUTH_URL,
     trustedOrigins: clientOrigins,
     database: prismaAdapter(prisma, {
         provider: "postgresql",
@@ -20,16 +23,4 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         },
     },
-    // Frontend (Vercel) and API (Railway) are different sites — cookies must
-    // be SameSite=None or the browser won't send the session on API calls.
-    ...(isHttpsAuth
-        ? {
-              advanced: {
-                  defaultCookieAttributes: {
-                      sameSite: "none" as const,
-                      secure: true,
-                  },
-              },
-          }
-        : {}),
 });

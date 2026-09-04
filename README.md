@@ -99,8 +99,8 @@ NEXT_PUBLIC_API_URL=http://localhost:8081
 | `PORT` | yes | e.g. `8081` |
 | `DATABASE_URL` | yes | PostgreSQL connection string |
 | `BETTER_AUTH_SECRET` | yes | random secret (`openssl rand -base64 32`) |
-| `BETTER_AUTH_URL` | yes | public API origin, e.g. `http://localhost:8081` |
-| `CLIENT_URL` | yes | comma-separated frontend origins, e.g. `http://localhost:3000` |
+| `BETTER_AUTH_URL` | yes | **frontend** public origin (`http://localhost:3000` / `https://chaillm.vercel.app`) |
+| `CLIENT_URL` | yes | comma-separated frontend origins, e.g. `http://localhost:3000,https://chaillm.vercel.app` |
 | `GOOGLE_CLIENT_ID` | yes | Google OAuth client |
 | `GOOGLE_CLIENT_SECRET` | yes | Google OAuth secret |
 | `OPENAI_API_KEY` | yes | chat + embeddings |
@@ -115,39 +115,38 @@ NEXT_PUBLIC_API_URL=http://localhost:8081
 | `MEM0_API_KEY` | optional | long-term memory |
 | `INNGEST_DEV` | local | set `1` for Inngest local mode |
 
-When `BETTER_AUTH_URL` is `https://`, auth cookies use `SameSite=None; Secure` so a Vercel frontend can talk to a Railway (or similar) API.
-
 `CLIENT_URL` may list several origins. If any of them is on `vercel.app`, `https://*.vercel.app` is also trusted so preview deployments work.
 
 ### Frontend (`client/my-app/.env.local`)
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | yes | API origin, no trailing slash |
+| `NEXT_PUBLIC_API_URL` or `BACKEND_URL` | yes | Express backend for **rewrites only** (browser still calls same-origin `/api/...`) |
 
-This value is inlined at **build** time. Changing it on Vercel requires a redeploy.
+On Vercel, set `BACKEND_URL` (or `NEXT_PUBLIC_API_URL`) to `https://chaillm-production.up.railway.app` and redeploy.
 
 ## Google OAuth
+
+Auth is same-origin on the frontend: the browser calls `/api/auth/*` on
+Vercel/localhost, and Next.js rewrites proxy to the Express API. That keeps
+OAuth cookies first-party (avoids `state_mismatch` across Vercel ↔ Railway).
 
 In [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → your OAuth client:
 
 **Authorized JavaScript origins**
 
 - Local: `http://localhost:3000`
-- Production frontend: your Vercel URL (e.g. `https://your-app.vercel.app`)
+- Production: `https://chaillm.vercel.app`
 
-**Authorized redirect URIs** (this is the **API**, not the Next.js app):
-
-```
-http://localhost:8081/api/auth/callback/google
-https://<your-api-host>/api/auth/callback/google
-```
-
-Example production path:
+**Authorized redirect URIs** (the **frontend** origin, not Railway):
 
 ```
-https://<railway-or-api-host>/api/auth/callback/google
+http://localhost:3000/api/auth/callback/google
+https://chaillm.vercel.app/api/auth/callback/google
 ```
+
+Set `BETTER_AUTH_URL` on the API to that same frontend origin
+(`http://localhost:3000` locally, `https://chaillm.vercel.app` in production).
 
 ## Scripts
 
@@ -172,7 +171,7 @@ https://<railway-or-api-host>/api/auth/callback/google
 
 ### Auth
 
-Better Auth is mounted at `/api/auth/*` **before** `express.json()`. The client uses `better-auth/react` with `credentials: "include"` and `baseURL` = `NEXT_PUBLIC_API_URL`.
+Better Auth is mounted at `/api/auth/*` **before** `express.json()`. The browser calls same-origin `/api/auth/*` (and `/api/v1/*`); Next.js rewrites proxy to Express.
 
 ### Sources (ingest)
 
@@ -246,14 +245,14 @@ Typical split:
 
 - Root Directory: `client/my-app`
 - Framework: Next.js
-- Env: `NEXT_PUBLIC_API_URL=https://<your-api-host>`
-- Redeploy after changing `NEXT_PUBLIC_*`
+- Env: `BACKEND_URL=https://chaillm-production.up.railway.app` (rewrite target)
+- Redeploy after changing backend URL / next.config
 
-**API host**
+**API host (Railway)**
 
-- `BETTER_AUTH_URL=https://<your-api-host>`
-- `CLIENT_URL=http://localhost:3000,https://<your-vercel-app>.vercel.app`
-- Redeploy after changing `CLIENT_URL` so CORS and OAuth callbacks match
+- `BETTER_AUTH_URL=https://chaillm.vercel.app` (frontend origin — not Railway)
+- `CLIENT_URL=http://localhost:3000,https://chaillm.vercel.app`
+- Redeploy after changing these so OAuth redirect + CORS match
 
 **Pinecone**
 
