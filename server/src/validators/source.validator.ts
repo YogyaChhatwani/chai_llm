@@ -17,13 +17,13 @@ export const SOURCE_STATUS = z.enum([
 
  export const createTextSourceSchema = z.object({
     title: z.string().trim().min(1, "Title is required"),
-    description: z.string().trim().max(500).optional(),
+    description: z.string().trim().min(1, "Content is required").max(200_000),
     type: z.literal("TEXT"),
  });
 
  export const createMarkdownSourceSchema = z.object({
     title: z.string().trim().min(1, "Title is required"),
-    description: z.string().trim().max(500).optional(),
+    description: z.string().trim().min(1, "Content is required").max(200_000),
     type: z.literal("MARKDOWN"),
    
  });

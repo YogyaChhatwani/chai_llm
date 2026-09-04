@@ -81,7 +81,8 @@ export function createSourceRecord(data: CreateSourceData) {
             workspaceId: data.workspaceId,
             type: data.type,
             title: data.title,
-            description: data.description,
+            // Pipeline reads text from `description` (no separate content column).
+            description: data.description ?? data.content ?? null,
             url: data.url,
             status: data.status,
             metadata: data.metadata,

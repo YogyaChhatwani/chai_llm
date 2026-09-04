@@ -26,10 +26,19 @@ export async function listSourcesForWorkspace(
 export async function createAndProcessSource(data: Parameters<typeof createSourceRecord>[0],) {
     const source = await createSourceRecord(data);
 
-    await enqueueSourceProcessing({
-        sourceId: source.id,
-        workspaceId: source.workspaceId,
-    });
+    try {
+        await enqueueSourceProcessing({
+            sourceId: source.id,
+            workspaceId: source.workspaceId,
+        });
+    } catch (error) {
+        // Source is already saved — don't fail the HTTP request if Inngest is down.
+        console.error(
+            `[source] failed to enqueue processing for ${source.id}:`,
+            error instanceof Error ? error.message : error,
+        );
+    }
+
     return source;
 }
 
@@ -98,7 +107,7 @@ export async function importWebsiteUrl(workspaceId: string, userId: string, inpu
         workspaceId,
         type: "WEBSITE",
         title: input.title,
-        content: scrapedData.markdown,
+        description: scrapedData.markdown,
         status: "PENDING",
         url: scrapedData.sourceUrl,
     });
@@ -132,7 +141,7 @@ export async function uploadPdfSource(
         workspaceId,
         type: "PDF",
         title: title?.trim() || file.originalname.replace(/\.pdf$/i, ""),
-        content,
+        description: content,
         status: "PENDING",
         metadata: {
             fileUrl: uploadFile.secureUrl,
@@ -152,7 +161,7 @@ export async function importYoutubeUrl(workspaceId: string, userId: string, inpu
         workspaceId,
         type: "YOUTUBE",
         title: input.title || `Youtube Video ${transcript.videoId}`,
-        content: transcript.content,
+        description: transcript.content,
         status: "PENDING",
         metadata: {
             videoId: transcript.videoId

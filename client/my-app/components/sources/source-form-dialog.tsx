@@ -368,7 +368,6 @@ function FieldTextarea({
         placeholder={placeholder}
         disabled={disabled}
         rows={rows}
-        maxLength={500}
       />
     </div>
   );
