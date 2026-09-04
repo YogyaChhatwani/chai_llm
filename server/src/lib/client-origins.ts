@@ -30,12 +30,14 @@ export function isOriginAllowed(
   if (!requestOrigin) return false;
 
   return allowed.some((pattern) => {
-    if (pattern.includes("*")) {
-      // e.g. https://*.vercel.app
+    if (pattern.includes("*") || pattern.includes("?")) {
+      // Escape regex metacharacters first, then restore wildcards.
+      // e.g. https://*.vercel.app → ^https://[^.]+\.vercel\.app$
       const regex = new RegExp(
         `^${pattern
-          .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
-          .replace(/\\\*/g, "[^.]+")}$`,
+          .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+          .replace(/\*/g, "[^.]+")
+          .replace(/\?/g, "[^.]")}$`,
       );
       return regex.test(requestOrigin);
     }
